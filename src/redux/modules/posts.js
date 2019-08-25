@@ -1,7 +1,7 @@
 // REDUCER
 export default (
   state = {
-    fetched: null,
+    fetched: [],
     query: '',
   },
   action
@@ -12,12 +12,19 @@ export default (
         ...state,
         fetched: action.payload,
       };
+    case 'SET_QUERY':
+      return {
+        ...state,
+        query: action.payload,
+      }
     default:
       return state;
   }
 };
 
 // SELECTORS
-// const filterPosts = query => {
-
-// }
+export const selectFilteredPosts = state =>
+  state.posts.fetched.filter(post =>
+    post.title.includes(state.posts.query) ||
+    post.body.includes(state.posts.query)
+  );

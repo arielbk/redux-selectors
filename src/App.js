@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
+import { selectFilteredPosts } from './redux/modules/posts';
 
-function App({ posts }) {
-  const [filter, setFilter] = useState('');
+function App({ posts, query }) {
   const [postsHighlighted, setPostsHighlighted] = useState();
-  
-  useEffect(() => {
-    if (!posts || !posts.length) return;
-    if (!filter) return setPostsHighlighted(posts);
 
-    const regex = new RegExp(filter);
+  useEffect(() => {
+    if (!query) return setPostsHighlighted(posts);
+
+    const regex = new RegExp(query);
     const newPosts = posts.map(post => {
       const newPost = {...post};
-      newPost.title = post.title.replace(regex, `<span class="highlight">${filter}</span>`);
-      newPost.body = post.body.replace(regex, `<span class="highlight">${filter}</span>`);
+      newPost.title = post.title.replace(regex, `<span class="highlight">${query}</span>`);
+      newPost.body = post.body.replace(regex, `<span class="highlight">${query}</span>`);
       return newPost;
     });
     setPostsHighlighted(newPosts);
-  }, [filter, posts]);
+  }, [posts, query]);
 
   const dispatch = useDispatch();
   const fetchPosts = () => {
@@ -28,29 +27,32 @@ function App({ posts }) {
         payload: res,
       }));
   }
-
-  const onFilterChange = e => setFilter(e.target.value.toLowerCase());
+  const onFilterChange = e => dispatch({
+    type: 'SET_QUERY',
+    payload: e.target.value.toLowerCase(),
+  });
 
   return (
     <div className="app">
       <h1>Filter Search</h1>
       <button onClick={fetchPosts}>Fetch Posts</button>
-      <input placeholder="Filter..." onChange={onFilterChange} value={filter} />
+      <input placeholder="Filter..." onChange={onFilterChange} value={query} />
       {postsHighlighted && postsHighlighted.length
-        ? <section>
-          {postsHighlighted.map(post =>
-              post.title.includes(filter) || post.body.includes(filter) ? (
-              <article key={post.id}>
-                <h2 dangerouslySetInnerHTML={{ __html: post.title }} />
-                <p dangerouslySetInnerHTML={{ __html: post.body }} />
-              </article>
-            ) : ''
-        )}
-        </section>
+        ? <React.Fragment>
+          <h3>Total: {postsHighlighted.length}</h3>
+          <section>
+            {postsHighlighted.map(post =>
+                <article key={post.id}>
+                  <h2 dangerouslySetInnerHTML={{ __html: post.title }} />
+                  <p dangerouslySetInnerHTML={{ __html: post.body }} />
+                </article>
+          )}
+          </section>
+        </React.Fragment>
         : ''}
     </div>
   );
 };
 
-const mapStateToProps = ({ posts }) => ({ posts: posts.fetched });
+const mapStateToProps = state => ({ posts: selectFilteredPosts(state), query: state.posts.query });
 export default connect(mapStateToProps)(App);
