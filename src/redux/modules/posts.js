@@ -1,3 +1,5 @@
+import { createSelector } from 'reselect';
+
 // REDUCER
 export default (
   state = {
@@ -23,8 +25,13 @@ export default (
 };
 
 // SELECTORS
-export const selectFilteredPosts = state =>
-  state.posts.fetched.filter(post =>
-    post.title.includes(state.posts.query) ||
-    post.body.includes(state.posts.query)
-  );
+const getPosts = state => state.posts.fetched;
+const getQuery = state => state.posts.query;
+
+export const selectFilteredPosts = createSelector(
+  getPosts,
+  getQuery,
+  (posts, query) => posts.filter(post =>
+    post.title.includes(query) || post.body.includes(query)
+  ),
+)

@@ -46,7 +46,7 @@ function App({ posts, query }) {
                   <h2 dangerouslySetInnerHTML={{ __html: post.title }} />
                   <p dangerouslySetInnerHTML={{ __html: post.body }} />
                 </article>
-          )}
+            )}
           </section>
         </React.Fragment>
         : ''}

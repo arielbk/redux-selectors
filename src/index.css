@@ -18,12 +18,15 @@ body {
 h1,
 h2,
 h3 {
-  color: #333;
   text-align: center;
 }
 
 h1 {
   text-transform: uppercase;
+}
+
+h3 {
+  color: #777;
 }
 
 p {
